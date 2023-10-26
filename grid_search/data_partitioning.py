@@ -18,12 +18,12 @@ def num_of_elements_in(start, end, range):
   return math.ceil((end - start) / range)
 
 interval = [
-    [1, 10, 1],
+    [1, 10, 2],
     [11, 20, 1],
-    [21, 30, 1]
+    [21, 300, 3]
   ]
 
-max_batch_items = 90
+max_batch_items = 10
 
 # we want to divide the interval into N intervals with a maximum of max_batch_items each
 
@@ -66,7 +66,7 @@ def next_partition():
   
   for i in range(paramsN):
     start, end, step = interval[i]
-    elements = num_of_elements_in(start, end, step)
+    elements = num_of_elements_in(start, end, 1)
     i_partitions = partitions[i]
     i_partition = current_partition[i]
     
