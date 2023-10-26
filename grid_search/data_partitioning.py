@@ -1,5 +1,9 @@
 import math
 import doctest
+import numpy as np
+
+
+range = np.arange
 
 def l_mul(l_nums):
     result = 1
@@ -18,12 +22,12 @@ def num_of_elements_in(start, end, range):
   return math.ceil((end - start) / range)
 
 interval = [
-    [1, 10, 2],
-    [11, 20, 1],
-    [21, 300, 3]
+    [1.3, 14.5, 2.2],
+    [11.3, 15+np.pi, np.pi**2-1],
+    [21, 30, 3]
   ]
 
-max_batch_items = 10
+max_batch_items = 100
 
 # we want to divide the interval into N intervals with a maximum of max_batch_items each
 
@@ -77,6 +81,7 @@ def next_partition():
     min_end = start + elements * (i_partition + 1) / i_partitions
     i_end = i_start
     while i_end < min_end: i_end += step
+    if i_end > end: i_end = end
     
     current_elements[i] = [ i_start, i_end, step ]
     
@@ -97,6 +102,7 @@ def next_partition():
 print("Interval:", interval , "(", total_elements, "elements )")
 print("Max batch items:", max_batch_items)
 print("Min batches:", min_batches)
+print("Actual batches", l_mul(partitions))
 print("Partitions:", partitions)
 
 bench_results = []
@@ -108,6 +114,7 @@ for i in range(*interval[0]):
 test_results = []
 while True:
   p = next_partition()
+  print(p)
   if not p: break
   
   for i in range(*p[0]):
