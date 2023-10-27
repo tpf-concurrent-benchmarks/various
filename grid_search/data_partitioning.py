@@ -144,15 +144,12 @@ def unfold_work_plan(work_plan: WorkPlan) -> List[List[int]]:
 
 
 def assert_work_is_splitted_correctly(work: Work, max_chunk_size: int):
-    print("Work:", work)
     unfolded_work = unfold_work(work)
     unfolded_work = [[round(x, 2) for x in work_unit] for work_unit in unfolded_work]
-    print("Unfolded work:", unfolded_work)
 
     work_plan = split_work_into_chunks(work, max_chunk_size, 2)
     unfolded_work_plan = unfold_work_plan(work_plan)
     unfolded_work_plan = [[round(x, 2) for x in work_unit] for work_unit in unfolded_work_plan]
-    print("Unfolded work plan:", unfolded_work_plan)
 
     for work_unit in unfolded_work:
         try:
@@ -162,7 +159,6 @@ def assert_work_is_splitted_correctly(work: Work, max_chunk_size: int):
 
     if unfolded_work_plan:
         raise AssertionError(f"Work plan has extra work units not found in the original work: {unfolded_work_plan}")
-    print("Work is splitted correctly")
 
 
 def run_tests():
