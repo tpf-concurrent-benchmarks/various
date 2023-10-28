@@ -1,4 +1,3 @@
-import decimal
 import math
 from typing import Iterator
 
@@ -25,7 +24,7 @@ class Interval:
 
 
     @staticmethod
-    def __round_number(x: int | float | decimal.Decimal, precision: int | None) -> int | float:
+    def __round_number(x: int | float, precision: int | None) -> int | float:
         if precision is None:
             return x
         return round(x, precision)
