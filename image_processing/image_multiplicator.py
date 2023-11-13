@@ -12,10 +12,14 @@ Then, from the images in folder_2 it saves the following in folder_3:
 '''
 import os
 from PIL import Image
+import time
+from tqdm import tqdm
 
 folder_1 = 'input'
 folder_2 = 'folder_2'
 folder_3 = 'folder_3'
+
+start_time = time.time()
 
 # Create folder_2 and folder_3 if they don't exist
 if not os.path.exists(folder_2):
@@ -24,8 +28,8 @@ if not os.path.exists(folder_3):
     os.makedirs(folder_3)
     
 # Flip images in folder_1
-
-for filename in os.listdir(folder_1):
+file_list = os.listdir(folder_1)
+for filename in tqdm(file_list, desc="Processing images", unit="image"):
     img = Image.open(f'{folder_1}/{filename}')
     raw_filename, extension = os.path.splitext(filename)
     
@@ -37,8 +41,8 @@ for filename in os.listdir(folder_1):
     flip_v.save(f'{folder_2}/{raw_filename}_flip_v{extension}')
 
 # Rotate images in folder_2
-
-for filename in os.listdir(folder_2):
+file_list = os.listdir(folder_2)
+for filename in tqdm(file_list, desc="Processing images", unit="image"):
     img = Image.open(f'{folder_2}/{filename}')
     raw_filename, extension = os.path.splitext(filename)
     
@@ -50,3 +54,5 @@ for filename in os.listdir(folder_2):
     rotate_90.save(f'{folder_3}/{raw_filename}_rotate_90{extension}')
     rotate_180.save(f'{folder_3}/{raw_filename}_rotate_180{extension}')
     rotate_270.save(f'{folder_3}/{raw_filename}_rotate_270{extension}')
+    
+print(f'--- {time.time() - start_time} seconds ---')
