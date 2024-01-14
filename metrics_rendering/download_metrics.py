@@ -3,17 +3,20 @@ import os
 import requests
 import argparse
 import yaml
-from typing import Tuple
+from typing import Tuple, Dict, List
+import progressbar
 
 
 class GrafanaPanelDownloader:
     def __init__(self, grafana_url: str,
                  dashboard_uid: str,
                  timespan: Tuple[str, str],
+                 variables: Dict[str, Tuple[str, List[str]]],
                  image_width: int = 1000,
                  image_height: int = 500,
                  theme: str = "light"):
         self._grafana_url = grafana_url
+        self._variables = variables
         self._image_width = image_width
         self._image_height = image_height
         self._dashboard_uid = dashboard_uid
@@ -32,7 +35,7 @@ class GrafanaPanelDownloader:
         panel_name = panel_name.lower()
 
         for panel in self._dashboard_json["dashboard"]["panels"]:
-            if panel_name in panel["title"].replace(" ", "").replace("_", "").lower():
+            if panel_name in panel["displayTitle"].replace(" ", "").replace("_", "").lower():
                 return panel["id"]
         return None
 
@@ -41,11 +44,19 @@ class GrafanaPanelDownloader:
         if panel_id is None:
             raise ValueError(f"Panel with name {panel_name} not found")
 
-        panel_png = requests.get(f"{self._grafana_url}/render/d-solo/{self._dashboard_uid}/"
-                                 f"{self._dashboard_json['meta']['slug']}?"
-                                 f"orgId=1&panelId={panel_id}&width={self._image_width}&height={self._image_height}"
-                                 f"&from={self._timespan[0]}&to={self._timespan[1]}"
-                                 f"&tz=America%2FArgentina%2FBuenos_Aires&theme={self._theme}").content
+        url = f"{self._grafana_url}/render/d-solo/{self._dashboard_uid}/" \
+              f"{self._dashboard_json['meta']['slug']}?" \
+              f"orgId=1&panelId={panel_id}&width={self._image_width}&height={self._image_height}" \
+              f"&from={self._timespan[0]}&to={self._timespan[1]}" \
+              f"&tz=America%2FArgentina%2FBuenos_Aires&theme={self._theme}"
+
+        for variable in self._variables:
+            if isinstance(self._variables[variable], str):
+                url += f"&var-{variable}={self._variables[variable]}"
+            else:
+                for value in self._variables[variable]:
+                    url += f"&var-{variable}={value}"
+        panel_png = requests.get(url).content
 
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
         with open(save_path, "wb") as f:
@@ -69,18 +80,24 @@ def main():
     with open(args.config_path, "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
+    total_pngs = len(config["folders"]) * len(config["panels"])
+    bar = progressbar.ProgressBar(maxval=total_pngs,
+                                  widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+
     for folder_name in config["folders"]:
         start_time = config["folders"][folder_name]["from"]
         end_time = config["folders"][folder_name]["to"]
         grafana_panel_downloader = GrafanaPanelDownloader(grafana_url=config["grafana_url"],
                                                           dashboard_uid=config["dashboard_uid"],
                                                           timespan=(start_time, end_time),
+                                                          variables=config["variables"],
                                                           image_width=config["size"]["width"],
                                                           image_height=config["size"]["height"],
                                                           theme=config["theme"])
         for panel_name in config["panels"]:
             save_path = os.path.join(context, folder_name, f"{panel_name}.png")
             grafana_panel_downloader.download_panel(panel_name, save_path)
+            bar.update(bar.value + 1)
 
 
 if __name__ == "__main__":
