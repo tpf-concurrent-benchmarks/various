@@ -6,7 +6,11 @@ the metrics you want to download as .png files from Grafana
 ## Requirements
 
 For the script to work, you need the following:
-- A running Grafana instance with anonymous access enabled
+- Python 3. Get the dependencies by running
+```shell
+pip3 install -r requirements.txt
+```
+- A running Grafana instance that uses [efoppiano/grafana](https://hub.docker.com/r/efoppiano/grafana) with anonymous access enabled
 - [Grafana Image Renderer](https://grafana.com/grafana/plugins/grafana-image-renderer/) plugin installed
 
 ## Usage
@@ -28,13 +32,13 @@ python3 download_metrics.py -h
 grafana_url: http://localhost:8081
 dashboard_uid: grid_search_dashboard
 folders:
-  4-Workers:
+  4-Nodes:
     from: 1700111859229
     to: 1700112759229
-  8-Workers:
+  8-Nodes:
     from: 1700115459229
     to: 1700116359229
-  16-Workers:
+  16-Nodes:
     from: 1700119059229
     to: 1700119959229
 panels:
