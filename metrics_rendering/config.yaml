@@ -1,13 +1,13 @@
 grafana_url: http://localhost:8081
 dashboard_uid: grid_search_dashboard
 folders:
-  4-Workers:
+  4-Nodes:
     from: 1700111859229
     to: 1700112759229
-  8-Workers:
+  8-Nodes:
     from: 1700115459229
     to: 1700116359229
-  16-Workers:
+  16-Nodes:
     from: 1700119059229
     to: 1700119959229
 panels:
